@@ -60,10 +60,10 @@ func (c *Client) FindHealthyMember(members []Member) (Member, error) {
 		json.NewDecoder(resp.Body).Decode(&jresp)
 		resp.Body.Close()
 		if jresp["health"] != "true" {
-			log.Println("Unhealthy member", url)
+			log.Printf("Unhealthy member %#v\n", member)
 			continue
 		} else {
-			log.Println("Healthy member", url)
+			log.Println("Healthy member %#v\n", member)
 			return member, nil
 		}
 	}
@@ -116,14 +116,14 @@ func (c *Client) ListMembers(hm Member) ([]Member, error) {
 	json.NewDecoder(resp.Body).Decode(&jresp)
 	for _, jm := range jresp["members"] {
 		m := Member{
-			ID:   jm.id,
-			Name: jm.name,
+			ID:   jm.Id,
+			Name: jm.Name,
 		}
-		if len(jm.clientURLs) > 0 {
-			m.ClientURL = jm.clientURLs[0]
+		if len(jm.ClientURLs) > 0 {
+			m.ClientURL = jm.ClientURLs[0]
 		}
-		if len(jm.peerURLs) > 0 {
-			m.PeerURL = jm.peerURLs[0]
+		if len(jm.PeerURLs) > 0 {
+			m.PeerURL = jm.PeerURLs[0]
 		}
 		members = append(members, m)
 	}
@@ -140,8 +140,8 @@ type Member struct {
 
 // Needed to marshal json response for listing members
 type jsonMember struct {
-	id         string
-	name       string
-	clientURLs []string
-	peerURLs   []string
+	Id         string
+	Name       string
+	ClientURLs []string
+	PeerURLs   []string
 }
