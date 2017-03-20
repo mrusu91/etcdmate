@@ -1,0 +1,11 @@
+FROM golang:1.6
+
+ENV USER root
+
+WORKDIR /go/src/github.com/viruxel/etcdmate
+COPY . .
+
+RUN go get -u github.com/tools/godep && \
+  godep restore
+
+ENTRYPOINT ["/bin/bash"]

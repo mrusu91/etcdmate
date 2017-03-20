@@ -1,0 +1,25 @@
+language: go
+
+go:
+ - 1.6
+ - 1.7.x
+ - 1.8.x
+
+before_install:
+ - go get github.com/tools/godep
+
+install:
+ - godep restore
+
+script:
+  - "GOOS=linux GOARCH=amd64 go build -o etcdmate-$TRAVIS_TAG-linux-amd64"
+
+deploy:
+  provider: releases
+  skip_cleanup: true
+  api_key:
+    secure: d7aOEvuHkP1ebk0iZFBw2vXWEEdROJNfujeFx0YqzWgGgZ4mkZC81FM85l4zgQjen5ufiD6Wes97pB13nj5K16zQfD+Lu9+9kdFFa+YAQ7clTUsI4V66trrK24jHlfoTkEf2aIZB/gjB99h31ZF6pGyePrFXsrpzTpQ3b/Sj+kctOaoagtZ0RnICpLX+QTDNl96UPxlolgHto1qoKgt5W2bdbSQPIsC8zfjYTR/ihlYYsAtHWJLoOm+a/kIJvL60ixfaKQL6MM25h9U0B0LyQhZUB9YtLWph6VakkQTVzMy2VJXGn3N7+vAyB2b8Nb3SW99qGHFjtG33lo0AZ8GwULmXyfqW4gTUt7QfAvFuVfgZsPuL5BT/BAxf3hTO+5b01n8j/B4xgCALUVN4vwh9SigHlp6WAwe+DOHgK5CduklgRP2wI/8zgY1PMAdKZqpBqfP3Jtq0Svz/6w/sCDasFSv+UzXMG7vLx13luKf9EvAgp01unZHf8H/ZA8/XzhZZasH1rWxa1N4o8+4KkP9gI4FRa/VUWiSLPYweQnsMD8WhXltYHPvTYgsceSiXtdpSMS2xIUNeL0SWPUBjryL4hWJJ5OKU3fK8m8m8Lwf4zKYL5DgBhbKeBI/1R4sfMEnQ6knykAaH/NOnXUFQfFT/HNiZ1EIjnx6Xw9gvewtPJdI=
+  file: etcdmate-$TRAVIS_TAG-linux-amd64
+  on:
+    repo: viruxel/etcdmate
+    tags: true
