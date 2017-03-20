@@ -115,12 +115,17 @@ func (c *Client) ListMembers(hm Member) ([]Member, error) {
 	var jresp map[string][]jsonMember
 	json.NewDecoder(resp.Body).Decode(&jresp)
 	for _, jm := range jresp["members"] {
-		members = append(members, Member{
-			ID:        jm.id,
-			Name:      jm.name,
-			ClientURL: jm.clientURLs[0],
-			PeerURL:   jm.peerURLs[0],
-		})
+		m := Member{
+			ID:   jm.id,
+			Name: jm.name,
+		}
+		if len(jm.clientURLs) > 0 {
+			m.ClientURL = jm.clientURLs[0]
+		}
+		if len(jm.peerURLs) > 0 {
+			m.PeerURL = jm.peerURLs[0]
+		}
+		members = append(members, m)
 	}
 	log.Println("Found members", members)
 	return members, nil
