@@ -63,7 +63,7 @@ func (c *Client) FindHealthyMember(members []Member) (Member, error) {
 			log.Printf("Unhealthy member %+v\n", member)
 			continue
 		} else {
-			log.Println("Healthy member %+v\n", member)
+			log.Printf("Healthy member %+v\n", member)
 			return member, nil
 		}
 	}
