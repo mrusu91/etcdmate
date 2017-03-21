@@ -90,7 +90,7 @@ func (c *Client) AddMember(hm Member, am Member) error {
 	log.Printf("Adding member %+v\n", am)
 	url := fmt.Sprintf("%s/v2/members", hm.ClientURL)
 	byteData := []byte(fmt.Sprintf(
-		"{\"name\": \"%s\", \"peerURLs\": [\"%s\"]}",
+		`{"name": "%s", "peerURLs": ["%s"]}`,
 		am.Name,
 		am.PeerURL,
 	))

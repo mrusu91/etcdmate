@@ -335,15 +335,13 @@ func WriteDropIn(expectedMembers []etcdclient.Member, state string) {
 	}
 	defer file.Close()
 
-	fmt.Fprintln(file, "[Service]")
 	fmt.Fprintf(
 		file,
-		"Environment=ETCD_INITIAL_CLUSTER=%s\n",
+		`[Service]
+Environment=ETCD_INITIAL_CLUSTER=%s
+Environment=ETCD_INITIAL_CLUSTER_STATE=%s
+`,
 		strings.Join(initCluster, ","),
-	)
-	fmt.Fprintf(
-		file,
-		"Environment=ETCD_INITIAL_CLUSTER_STATE=%s\n",
 		state,
 	)
 }
