@@ -97,12 +97,12 @@ var (
 func main() {
 	kingpin.Version(version)
 	kingpin.Parse()
-	fmt.Printf("Drop-in file: %s\n", *dropInFile)
-	fmt.Printf("Timeout: %s\n", *timeout)
-	fmt.Printf("Client schema: %s\n", *clientSchema)
-	fmt.Printf("Client port: %d\n", *clientPort)
-	fmt.Printf("Peer schema: %s\n", *peerSchema)
-	fmt.Printf("Peer port: %d\n", *peerPort)
+	log.Printf("Drop-in file: %s\n", *dropInFile)
+	log.Printf("Timeout: %s\n", *timeout)
+	log.Printf("Client schema: %s\n", *clientSchema)
+	log.Printf("Client port: %d\n", *clientPort)
+	log.Printf("Peer schema: %s\n", *peerSchema)
+	log.Printf("Peer port: %d\n", *peerPort)
 
 	localSess := session.Must(session.NewSession())
 	metadata, err := GetMetadata(localSess)
@@ -132,14 +132,12 @@ func main() {
 		WriteDropIn(expectedMembers, "new")
 		os.Exit(0)
 	}
-	log.Println("Found healthy member", healthyMember)
 	existingMembers, err := etcdClient.ListMembers(healthyMember)
 	if err != nil {
 		log.Println(err)
 		WriteDropIn(expectedMembers, "new")
 		os.Exit(0)
 	}
-	log.Println("Found existing Etcd members", existingMembers)
 	RemoveStaleMembers(
 		etcdClient,
 		healthyMember,
@@ -165,7 +163,7 @@ func GetMetadata(sess *session.Session) (ec2metadata.EC2InstanceIdentityDocument
 	if err != nil {
 		return ec2metadata.EC2InstanceIdentityDocument{}, err
 	}
-	log.Printf("Metadata %+v\n", id)
+	log.Printf("Metadata: %+v\n", id)
 	return id, nil
 }
 
@@ -197,7 +195,7 @@ func GetAsgInstanceIds(svc *autoscaling.AutoScaling, asgName string) ([]*string,
 	instances := resp.AutoScalingGroups[0].Instances
 	instanceIds := []*string{}
 	for _, instance := range instances {
-		log.Printf("Found instance %+v", instance)
+		log.Printf("Found instance %+v\n", instance)
 		if *instance.LifecycleState == "InService" {
 			instanceIds = append(instanceIds, instance.InstanceId)
 		} else {
@@ -219,7 +217,6 @@ func GetEC2Instances(sess *session.Session, instanceIds []*string) ([]ec2.Instan
 	instances := []ec2.Instance{}
 	for _, reservation := range resp.Reservations {
 		for _, instance := range reservation.Instances {
-			log.Println("Found EC2 instance", instance)
 			instances = append(instances, *instance)
 		}
 	}
@@ -260,7 +257,7 @@ func GetExpectedMembers(sess *session.Session, insId string) ([]etcdclient.Membe
 			),
 		})
 	}
-	log.Printf("Expected Members %#v\n", etcdMembers)
+	log.Printf("Expected Members %+v\n", etcdMembers)
 	return etcdMembers, nil
 }
 
@@ -284,7 +281,6 @@ func RemoveStaleMembers(
 			if err != nil {
 				log.Fatal(err)
 			}
-			log.Println("Stale Etcd member removed", exiM)
 		}
 	}
 }
@@ -317,7 +313,6 @@ func MaybeAddMyself(
 		if err != nil {
 			log.Fatal(err)
 		}
-		log.Println("Member added", myself)
 	}
 }
 

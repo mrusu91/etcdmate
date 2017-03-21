@@ -60,10 +60,10 @@ func (c *Client) FindHealthyMember(members []Member) (Member, error) {
 		json.NewDecoder(resp.Body).Decode(&jresp)
 		resp.Body.Close()
 		if jresp["health"] != "true" {
-			log.Printf("Unhealthy member %#v\n", member)
+			log.Printf("Unhealthy member %+v\n", member)
 			continue
 		} else {
-			log.Println("Healthy member %#v\n", member)
+			log.Println("Healthy member %+v\n", member)
 			return member, nil
 		}
 	}
@@ -71,7 +71,7 @@ func (c *Client) FindHealthyMember(members []Member) (Member, error) {
 }
 
 func (c *Client) RemoveMember(hm Member, rm Member) error {
-	log.Println("Removing member", rm)
+	log.Printf("Removing member %+v\n", rm)
 	url := fmt.Sprintf("%s/v2/members/%s", hm.ClientURL, rm.ID)
 	req, err := http.NewRequest("DELETE", url, nil)
 	if err != nil {
@@ -82,12 +82,12 @@ func (c *Client) RemoveMember(hm Member, rm Member) error {
 		return err
 	}
 	defer resp.Body.Close()
-	log.Println("Member removed")
+	log.Printf("Member removed %+v\n", rm)
 	return nil
 }
 
 func (c *Client) AddMember(hm Member, am Member) error {
-	log.Println("Adding member", am)
+	log.Printf("Adding member %+v\n", am)
 	url := fmt.Sprintf("%s/v2/members", hm.ClientURL)
 	byteData := []byte(fmt.Sprintf(
 		"{\"name\": \"%s\", \"peerURLs\": [\"%s\"]}",
@@ -99,7 +99,7 @@ func (c *Client) AddMember(hm Member, am Member) error {
 		return err
 	}
 	defer resp.Body.Close()
-	log.Println("Member added")
+	log.Printf("Member added %+v\n", am)
 	return nil
 }
 
@@ -127,7 +127,7 @@ func (c *Client) ListMembers(hm Member) ([]Member, error) {
 		}
 		members = append(members, m)
 	}
-	log.Println("Found members", members)
+	log.Printf("Found members %+v\n", members)
 	return members, nil
 }
 
