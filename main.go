@@ -19,7 +19,7 @@ import (
 )
 
 var (
-	version    = "0.1.1"
+	version    = "0.1.2"
 	dropInFile = kingpin.Flag(
 		"drop-in-file",
 		"The systemd drop-in file to create.",
