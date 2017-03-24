@@ -19,14 +19,14 @@ import (
 )
 
 var (
-	version    = "0.1.2"
-	dropInFile = kingpin.Flag(
-		"drop-in-file",
-		"The systemd drop-in file to create.",
+	version = "0.1.2"
+	envFile = kingpin.Flag(
+		"env-file",
+		"The systemd env file to create.",
 	).Default(
 		"/var/run/systemd/system/etcd2.service.d/50-etcdmate.conf",
 	).Envar(
-		"ETCDMATE_DROP_IN_FILE",
+		"ETCDMATE_ENV_FILE",
 	).String()
 	timeout = kingpin.Flag(
 		"timeout",
@@ -97,7 +97,7 @@ var (
 func main() {
 	kingpin.Version(version)
 	kingpin.Parse()
-	log.Printf("Drop-in file: %s\n", *dropInFile)
+	log.Printf("env file: %s\n", *envFile)
 	log.Printf("Timeout: %s\n", *timeout)
 	log.Printf("Client schema: %s\n", *clientSchema)
 	log.Printf("Client port: %d\n", *clientPort)
@@ -129,13 +129,13 @@ func main() {
 	if err != nil {
 		// The cluster is not up. Assume new cluster
 		log.Println(err)
-		WriteDropIn(expectedMembers, "new")
+		WriteEnv(expectedMembers, "new")
 		os.Exit(0)
 	}
 	existingMembers, err := etcdClient.ListMembers(healthyMember)
 	if err != nil {
 		log.Println(err)
-		WriteDropIn(expectedMembers, "new")
+		WriteEnv(expectedMembers, "new")
 		os.Exit(0)
 	}
 	RemoveStaleMembers(
@@ -151,7 +151,7 @@ func main() {
 		existingMembers,
 		myself,
 	)
-	WriteDropIn(expectedMembers, "existing")
+	WriteEnv(expectedMembers, "existing")
 }
 
 func GetMetadata(sess *session.Session) (ec2metadata.EC2InstanceIdentityDocument, error) {
@@ -316,7 +316,7 @@ func MaybeAddMyself(
 	}
 }
 
-func WriteDropIn(expectedMembers []etcdclient.Member, state string) {
+func WriteEnv(expectedMembers []etcdclient.Member, state string) {
 	initCluster := []string{}
 	for _, member := range expectedMembers {
 		initCluster = append(initCluster, fmt.Sprint(
@@ -325,11 +325,11 @@ func WriteDropIn(expectedMembers []etcdclient.Member, state string) {
 			member.PeerURL,
 		))
 	}
-	err := os.MkdirAll(path.Dir(*dropInFile), 0777)
+	err := os.MkdirAll(path.Dir(*envFile), 0777)
 	if err != nil {
 		log.Fatal(err)
 	}
-	file, err := os.Create(*dropInFile)
+	file, err := os.Create(*envFile)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -337,11 +337,12 @@ func WriteDropIn(expectedMembers []etcdclient.Member, state string) {
 
 	fmt.Fprintf(
 		file,
-		`[Service]
-Environment=ETCD_INITIAL_CLUSTER=%s
-Environment=ETCD_INITIAL_CLUSTER_STATE=%s
-`,
+		"Environment=ETCD_INITIAL_CLUSTER=%s\n",
 		strings.Join(initCluster, ","),
+	)
+	fmt.Fprintf(
+		file,
+		"Environment=ETCD_INITIAL_CLUSTER_STATE=%s\n",
 		state,
 	)
 }
