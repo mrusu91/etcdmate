@@ -19,7 +19,7 @@ import (
 )
 
 var (
-	version = "0.1.3"
+	version = "0.1.4"
 	envFile = kingpin.Flag(
 		"env-file",
 		"The systemd env file to create.",
