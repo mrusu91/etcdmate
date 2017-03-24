@@ -337,12 +337,12 @@ func WriteEnv(expectedMembers []etcdclient.Member, state string) {
 
 	fmt.Fprintf(
 		file,
-		"Environment=ETCD_INITIAL_CLUSTER=%s\n",
+		"ETCD_INITIAL_CLUSTER=%s\n",
 		strings.Join(initCluster, ","),
 	)
 	fmt.Fprintf(
 		file,
-		"Environment=ETCD_INITIAL_CLUSTER_STATE=%s\n",
+		"ETCD_INITIAL_CLUSTER_STATE=%s\n",
 		state,
 	)
 }
